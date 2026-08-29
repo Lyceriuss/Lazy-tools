@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Timestamp Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
+    
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-white">Discord Timestamp</h1>
+      <p class="text-sm text-slate-400 mt-1">Pick a day, enter your time, and copy the tag.</p>
+    </div>
+
+    <!-- Step 1: 7-Day Picker -->
+    <div>
+      <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. Select Day</label>
+      <div id="day-buttons" class="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1"></div>
+    </div>
+
+    <!-- Step 2: Lazy Time Input -->
+    <div>
+      <label for="time-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">2. Enter Time (e.g. 2000 or 0830)</label>
+      <input 
+        type="text" 
+        id="time-input" 
+        maxlength="4" 
+        placeholder="2000"
+        class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg font-mono text-center tracking-widest text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+      />
+    </div>
+
+    <!-- Output & Copy Box -->
+    <div class="space-y-2 pt-2 border-t border-slate-800">
+      <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Generated Code</label>
+      <div class="flex items-center gap-2">
+        <div id="output" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 font-mono text-slate-300 text-sm truncate">
+          &lt;t:0000000000:F&gt;
+        </div>
+        <button 
+          id="copy-btn" 
+          class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium px-5 py-3 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/30">
+          Copy
+        </button>
+      </div>
+      <p id="copy-status" class="text-xs text-emerald-400 font-medium h-4 transition opacity-0 text-center">Copied to clipboard!</p>
+    </div>
+
+  </div>
+
+  <script>
+    let selectedDate = new Date();
+    const dayButtonsContainer = document.getElementById('day-buttons');
+    const timeInput = document.getElementById('time-input');
+    const output = document.getElementById('output');
+    const copyBtn = document.getElementById('copy-btn');
+    const copyStatus = document.getElementById('copy-status');
+
+    // Generate upcoming 7 days
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center ${
+        i === 0 
+          ? 'bg-indigo-600/20 border-indigo-500/50 text-indigo-300 font-medium' 
+          : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800'
+      }`;
+      
+      const dayName = i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'long' }));
+      const formattedDate = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+      btn.innerHTML = `<span>${dayName}</span><span class="text-xs text-slate-500 font-mono">${formattedDate}</span>`;
+      
+      btn.onclick = () => {
+        selectedDate = d;
+        document.querySelectorAll('#day-buttons button').forEach(b => {
+          b.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800';
+        });
+        btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center bg-indigo-600/20 border-indigo-500/50 text-indigo-300 font-medium';
+        updateTimestamp();
+      };
+
+      dayButtonsContainer.appendChild(btn);
+    }
+
+    function updateTimestamp() {
+      let raw = timeInput.value.replace(/[^0-9]/g, '');
+      if (raw.length < 4) {
+        output.textContent = '<t:0000000000:F>';
+        return;
+      }
+
+      const hours = parseInt(raw.slice(0, 2), 10);
+      const minutes = parseInt(raw.slice(2, 4), 10);
+
+      if (hours > 23 || minutes > 59) {
+        output.textContent = 'Invalid Time';
+        return;
+      }
+
+      const target = new Date(selectedDate);
+      target.setHours(hours, minutes, 0, 0);
+
+      const unixTime = Math.floor(target.getTime() / 1000);
+      output.textContent = `<t:${unixTime}:F>`;
+    }
+
+    timeInput.addEventListener('input', updateTimestamp);
+
+    // Auto-fill default time
+    timeInput.value = "2000";
+    updateTimestamp();
+
+    // Copy action
+    copyBtn.onclick = async () => {
+      const text = output.textContent;
+      if (text.startsWith('<t:')) {
+        await navigator.clipboard.writeText(text);
+        copyStatus.classList.remove('opacity-0');
+        setTimeout(() => copyStatus.classList.add('opacity-0'), 2000);
+      }
+    };
+  </script>
+</body>
+</html>
