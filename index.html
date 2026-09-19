@@ -3,128 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Discord Timestamp Generator</title>
+  <title>Lazy Tools - Discord & Diet</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
-  <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6">
-    
-    <div>
-      <h1 class="text-2xl font-bold tracking-tight text-white">Discord Timestamp</h1>
-      <p class="text-sm text-slate-400 mt-1">Pick a day, enter your time, and copy the tag.</p>
-    </div>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center p-4 sm:p-8 font-sans">
 
-    <!-- Step 1: 7-Day Picker -->
-    <div>
-      <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. Select Day</label>
-      <div id="day-buttons" class="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1"></div>
-    </div>
+  <!-- Main Container -->
+  <div class="max-w-3xl w-full space-y-6">
 
-    <!-- Step 2: Lazy Time Input -->
-    <div>
-      <label for="time-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">2. Enter Time (e.g. 2000 or 0830)</label>
-      <input 
-        type="text" 
-        id="time-input" 
-        maxlength="4" 
-        placeholder="2000"
-        class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg font-mono text-center tracking-widest text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-      />
-    </div>
-
-    <!-- Output & Copy Box -->
-    <div class="space-y-2 pt-2 border-t border-slate-800">
-      <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Generated Code</label>
-      <div class="flex items-center gap-2">
-        <div id="output" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 font-mono text-slate-300 text-sm truncate">
-          &lt;t:0000000000:F&gt;
-        </div>
-        <button 
-          id="copy-btn" 
-          class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium px-5 py-3 rounded-xl transition duration-150 shadow-lg shadow-indigo-600/30">
-          Copy
-        </button>
+    <!-- Header & Tab Navigation -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>⚡</span> Lazy Tools
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">Quick utilities for Discord and weekly nutrition tracking.</p>
       </div>
-      <p id="copy-status" class="text-xs text-emerald-400 font-medium h-4 transition opacity-0 text-center">Copied to clipboard!</p>
+      <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
+        <button id="tab-discord-btn" onclick="switchTab('discord')" class="px-4 py-2 rounded-lg text-sm font-medium transition bg-indigo-600 text-white shadow">🕒 Discord</button>
+        <button id="tab-diet-btn" onclick="switchTab('diet')" class="px-4 py-2 rounded-lg text-sm font-medium transition text-slate-400 hover:text-white">🥗 Diet</button>
+      </div>
     </div>
 
+    <!-- TAB 1: DISCORD TIMESTAMP GENERATOR -->
+    <div id="tab-discord" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 max-w-md mx-auto">
+      <div>
+        <h2 class="text-xl font-bold tracking-tight text-white">Discord Timestamp</h2>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. Select Day</label>
+        <div id="day-buttons" class="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto pr-1"></div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">2. Enter Time</label>
+        <input type="text" id="time-input" maxlength="4" placeholder="2000" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-lg font-mono text-center text-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition" />
+      </div>
+      <div class="space-y-2 pt-2 border-t border-slate-800">
+        <div class="flex items-center gap-2">
+          <div id="output" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 font-mono text-slate-300 text-sm truncate">&lt;t:0000000000:F&gt;</div>
+          <button id="copy-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-3 rounded-xl transition shadow-lg">Copy</button>
+        </div>
+        <p id="copy-status" class="text-xs text-emerald-400 font-medium h-4 transition opacity-0 text-center">Copied!</p>
+      </div>
+    </div>
+
+    <!-- TAB 2: WEEKLY DIET & MACRO PLANNER -->
+    <div id="tab-diet" class="hidden space-y-6">
+      <div>
+        <div id="diet-week-days" class="grid grid-cols-2 sm:grid-cols-7 gap-2"></div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h2 id="current-day-heading" class="text-xl font-bold text-white">Monday</h2>
+            <p id="current-day-subheading" class="text-xs text-slate-400">Daily nutrition totals vs targets</p>
+          </div>
+          <div class="flex gap-2 self-start sm:self-auto">
+            <button onclick="openTargetsModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium px-3 py-2 rounded-xl transition">⚙️ Targets</button>
+            <button onclick="openMealModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg">
+              <span>+</span> Add Meal
+            </button>
+          </div>
+        </div>
+        
+        <!-- Daglig Status: Energi, Makros & Mikros -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 shadow-inner flex flex-col gap-5">
+          
+          <!-- 1. ENERGI (Kcal separerat från makros) -->
+          <div class="flex items-center justify-between border-b border-slate-800/60 pb-4">
+            <div>
+              <h3 class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Dagens Kalorier</h3>
+              <div class="flex items-baseline gap-1.5">
+                <span id="prog-kcal-current" class="text-3xl font-black text-amber-400 font-mono">0</span>
+                <span id="prog-kcal-target" class="text-slate-500 text-sm font-mono font-medium">/ 0 kcal</span>
+              </div>
+            </div>
+            <div class="w-1/2 max-w-[180px] text-right">
+              <div class="w-full bg-slate-900 rounded-full h-2 mb-1.5"><div id="prog-kcal-bar" class="bg-amber-400 h-2 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+              <span id="prog-kcal-percent" class="text-[10px] text-amber-500/70 font-mono font-bold">0%</span>
+            </div>
+          </div>
+
+          <!-- 2. MAKROS (Protein, Fett, Kolhydrat - i rätt ordning) -->
+          <div class="grid grid-cols-3 gap-4 sm:gap-6">
+            <div>
+              <div class="flex justify-between text-[11px] mb-1.5"><span class="text-slate-400 uppercase font-bold tracking-wider">Protein</span><span id="prog-p-text" class="text-sky-400 font-mono font-semibold">0/0</span></div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5"><div id="prog-p-bar" class="bg-sky-400 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[11px] mb-1.5"><span class="text-slate-400 uppercase font-bold tracking-wider">Fett</span><span id="prog-f-text" class="text-rose-400 font-mono font-semibold">0/0</span></div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5"><div id="prog-f-bar" class="bg-rose-400 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[11px] mb-1.5"><span class="text-slate-400 uppercase font-bold tracking-wider">Kolhydrat</span><span id="prog-c-text" class="text-emerald-400 font-mono font-semibold">0/0</span></div>
+              <div class="w-full bg-slate-900 rounded-full h-1.5"><div id="prog-c-bar" class="bg-emerald-400 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+            </div>
+          </div>
+
+          <!-- 3. MIKROS (Primära och Dolda) -->
+          <div class="pt-4 mt-4 border-t border-slate-800/60">
+            <h3 class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-3">Essentiella Mikronutrienter (vs RDI)</h3>
+            
+            <!-- De 15 viktigaste -->
+            <div id="daily-micros-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+               <!-- Fylls av JavaScript -->
+            </div>
+
+            <!-- Den dolda/expanderbara listan -->
+            <details class="mt-4 group outline-none">
+              <summary class="text-[11px] text-slate-500 hover:text-slate-300 font-semibold cursor-pointer list-none flex items-center gap-2 transition-colors">
+                <span class="group-open:rotate-90 transition-transform text-[10px]">▶</span> Visa övriga spårämnen, socker & fettsyror
+              </summary>
+              <div id="daily-extras-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-800/50">
+                 <!-- Fylls av JavaScript -->
+              </div>
+            </details>
+          </div>
+          
+        </div>
+
+      </div>
+      <div class="space-y-3">
+        <div id="meals-container" class="space-y-3"></div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    let selectedDate = new Date();
-    const dayButtonsContainer = document.getElementById('day-buttons');
-    const timeInput = document.getElementById('time-input');
-    const output = document.getElementById('output');
-    const copyBtn = document.getElementById('copy-btn');
-    const copyStatus = document.getElementById('copy-status');
+  <!-- TARGETS MODAL -->
+  <div id="targets-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-4">
+      <h3 class="text-lg font-bold text-white border-b border-slate-800 pb-2">Daily Targets</h3>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div><label class="text-slate-400 text-xs">Calories</label><input type="number" id="target-kcal" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white mt-1"></div>
+        <div><label class="text-slate-400 text-xs">Protein (g)</label><input type="number" id="target-p" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white mt-1"></div>
+        <div><label class="text-slate-400 text-xs">Carbs (g)</label><input type="number" id="target-c" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white mt-1"></div>
+        <div><label class="text-slate-400 text-xs">Fat (g)</label><input type="number" id="target-f" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white mt-1"></div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="document.getElementById('targets-modal').classList.add('hidden')" class="px-4 py-2 text-xs text-slate-400 hover:text-white">Cancel</button>
+        <button onclick="saveTargets()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold">Save</button>
+      </div>
+    </div>
+  </div>
 
-    // Generate upcoming 7 days
-    for (let i = 0; i < 7; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center ${
-        i === 0 
-          ? 'bg-indigo-600/20 border-indigo-500/50 text-indigo-300 font-medium' 
-          : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800'
-      }`;
+  <!-- MEAL MODAL -->
+  <div id="meal-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-lg font-bold text-white" id="modal-title">Create Meal</h3>
+          <p class="text-xs text-slate-400" id="modal-day-title">Adding meal to Monday</p>
+        </div>
+        <button onclick="closeMealModal()" class="text-slate-400 hover:text-white text-xl font-bold px-2">&times;</button>
+      </div>
       
-      const dayName = i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'long' }));
-      const formattedDate = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      <div class="overflow-y-auto space-y-5 pr-1 flex-1">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Meal Name</label>
+          <input type="text" id="modal-meal-name" placeholder="e.g. Lunch" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+        
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col gap-3">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-300">Välj Råvara</label>
+          
+          <div class="flex flex-col sm:flex-row gap-2">
+            <select id="category-filter" onchange="updateFoodDropdown()" class="w-full sm:w-1/3 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Kött">Kött & Fågel</option>
+              <option value="Kolhydrat">Kolhydrater</option>
+              <option value="Frön">Frön & Nötter</option>
+              <option value="Övrigt">Övrigt</option>
+            </select>
+            
+            <select id="food-select" class="w-full sm:w-2/3 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <!-- Fylls på av JavaScript -->
+            </select>
+          </div>
 
-      btn.innerHTML = `<span>${dayName}</span><span class="text-xs text-slate-500 font-mono">${formattedDate}</span>`;
-      
-      btn.onclick = () => {
-        selectedDate = d;
-        document.querySelectorAll('#day-buttons button').forEach(b => {
-          b.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800';
-        });
-        btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border text-sm transition flex justify-between items-center bg-indigo-600/20 border-indigo-500/50 text-indigo-300 font-medium';
-        updateTimestamp();
-      };
+          <div class="flex items-center justify-between gap-3 pt-3 border-t border-slate-800 mt-2">
+            <div class="relative w-24">
+              <input type="number" id="ingredient-weight" placeholder="Gram" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3 pr-7 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+              <span class="absolute right-2 top-2 text-xs text-slate-500">g</span>
+            </div>
+            <button onclick="addIngredientToCurrentMeal()" id="add-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+              Lägg till
+            </button>
+          </div>
+        </div>
 
-      dayButtonsContainer.appendChild(btn);
-    }
+        <!-- Ingredients List -->
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Meal Ingredients</label>
+          <div id="modal-ingredients-list" class="space-y-1.5 text-xs"></div>
+        </div>
+        
+        <!-- Totals & RDI -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-3">
+          <div class="flex justify-between items-center text-xs font-mono border-b border-slate-800 pb-2">
+            <span class="text-slate-400 font-sans font-medium">Meal Total:</span>
+            <div class="flex gap-3">
+              <span class="text-amber-400" id="modal-total-kcal">0 kcal</span>
+              <span class="text-sky-400" id="modal-total-p">0g P</span>
+              <span class="text-emerald-400" id="modal-total-c">0g C</span>
+              <span class="text-rose-400" id="modal-total-f">0g F</span>
+            </div>
+          </div>
+          <!-- RDI Grid -->
+          <div class="grid grid-cols-3 gap-2 text-[10px] font-mono text-slate-300" id="rdi-container">
+             <!-- RDI fylls i av JS -->
+          </div>
+        </div>
+      </div>
 
-    function updateTimestamp() {
-      let raw = timeInput.value.replace(/[^0-9]/g, '');
-      if (raw.length < 4) {
-        output.textContent = '<t:0000000000:F>';
-        return;
-      }
+      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
+        <button onclick="closeMealModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
+        <button onclick="saveMealToDay()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/30">Save Meal</button>
+      </div>
+    </div>
+  </div>
 
-      const hours = parseInt(raw.slice(0, 2), 10);
-      const minutes = parseInt(raw.slice(2, 4), 10);
-
-      if (hours > 23 || minutes > 59) {
-        output.textContent = 'Invalid Time';
-        return;
-      }
-
-      const target = new Date(selectedDate);
-      target.setHours(hours, minutes, 0, 0);
-
-      const unixTime = Math.floor(target.getTime() / 1000);
-      output.textContent = `<t:${unixTime}:F>`;
-    }
-
-    timeInput.addEventListener('input', updateTimestamp);
-
-    // Auto-fill default time
-    timeInput.value = "2000";
-    updateTimestamp();
-
-    // Copy action
-    copyBtn.onclick = async () => {
-      const text = output.textContent;
-      if (text.startsWith('<t:')) {
-        await navigator.clipboard.writeText(text);
-        copyStatus.classList.remove('opacity-0');
-        setTimeout(() => copyStatus.classList.add('opacity-0'), 2000);
-      }
-    };
-  </script>
+  <script src="js/database.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/discord.js"></script>
+  <script src="js/diet.js"></script>
 </body>
 </html>
