@@ -33,6 +33,8 @@ let targets = JSON.parse(localStorage.getItem('lazy_diet_targets')) || {
   kcal: 2500, p: 160, c: 250, f: 70
 };
 
+let mealTemplates = JSON.parse(localStorage.getItem('lazy_diet_templates')) || [];
+
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 let currentDietDay = "Monday";
 let currentMealIngredients = [];
@@ -43,6 +45,7 @@ let deepDatabaseCache = null;
 
 function saveDietData() { localStorage.setItem('lazy_diet_data', JSON.stringify(dietData)); }
 function saveTargetsData() { localStorage.setItem('lazy_diet_targets', JSON.stringify(targets)); }
+function saveDietTemplates() { localStorage.setItem('lazy_diet_templates', JSON.stringify(mealTemplates)); }
 
 // --- DROPDOWN LOGIK ---
 const categoryFilter = document.getElementById('category-filter');
@@ -201,7 +204,7 @@ function renderDayFocus() {
   updateProgressBar('f', dayF, targets.f);
   updateProgressBar('c', dayC, targets.c);
 
- // 3. Hjälpfunktion för att rita ut de små mikrokorten
+  // 3. Hjälpfunktion för att rita ut de små mikrokorten med dubbla staplar (Överfyllnad)
   const renderMicroCards = (dataset, targetRDIList) => {
       return Object.keys(targetRDIList).map(key => {
           let currentAmount = dataset[key] || 0;
@@ -294,6 +297,7 @@ function openMealModal() {
   document.getElementById('modal-title').textContent = "Create Meal";
   document.getElementById('modal-day-title').textContent = `Adding meal to ${currentDietDay}`;
   document.getElementById('modal-meal-name').value = '';
+  document.getElementById('save-as-template').checked = false;
   
   updateFoodDropdown(); 
   renderModalIngredients();
@@ -308,6 +312,7 @@ function editMeal(index) {
   document.getElementById('modal-title').textContent = "Edit Meal";
   document.getElementById('modal-day-title').textContent = `Updating meal on ${currentDietDay}`;
   document.getElementById('modal-meal-name').value = meal.name;
+  document.getElementById('save-as-template').checked = false;
   
   updateFoodDropdown();
   renderModalIngredients();
@@ -433,6 +438,18 @@ function saveMealToDay() {
       completed: false 
   };
 
+  // Kolla om användaren vill spara detta som en mall också
+  const isTemplate = document.getElementById('save-as-template') && document.getElementById('save-as-template').checked;
+  if (isTemplate) {
+      mealTemplates.push({
+          name: name,
+          items: JSON.parse(JSON.stringify(currentMealIngredients)),
+          macros: JSON.parse(JSON.stringify(newMeal.macros)),
+          micros: JSON.parse(JSON.stringify(totalMicros))
+      });
+      saveDietTemplates();
+  }
+
   if (editingMealIndex !== null) {
     newMeal.completed = dietData[currentDietDay][editingMealIndex].completed;
     dietData[currentDietDay][editingMealIndex] = newMeal;
@@ -443,4 +460,69 @@ function saveMealToDay() {
   saveDietData();
   closeMealModal();
   renderDietWeek();
+}
+
+// --- MALL (TEMPLATE) LOGIK ---
+function openTemplatesModal() {
+    renderTemplatesList();
+    document.getElementById('templates-modal').classList.remove('hidden');
+}
+
+function closeTemplatesModal() {
+    document.getElementById('templates-modal').classList.add('hidden');
+}
+
+function renderTemplatesList() {
+    const container = document.getElementById('templates-list');
+    if (mealTemplates.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Du har inga sparade mallar ännu. Skapa en måltid och kryssa i "Spara som mall".</p>';
+        return;
+    }
+
+    container.innerHTML = mealTemplates.map((tpl, idx) => `
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 hover:border-indigo-500/50 transition">
+            <div class="flex justify-between items-center mb-2">
+                <h4 class="font-bold text-white text-sm">${tpl.name}</h4>
+                <div class="flex gap-2">
+                    <button onclick="addTemplateToDay(${idx})" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow">Lägg till i ${currentDietDay.slice(0,3)}</button>
+                    <button onclick="deleteTemplate(${idx})" class="text-rose-400 hover:text-rose-300 px-2 font-bold text-lg">&times;</button>
+                </div>
+            </div>
+            <div class="flex gap-3 text-xs font-mono border-b border-slate-800 pb-2 mb-2">
+                <span class="text-amber-400">${Math.round(tpl.macros.kcal)} kcal</span>
+                <span class="text-sky-400">${Math.round(tpl.macros.p)}g P</span>
+                <span class="text-emerald-400">${Math.round(tpl.macros.c)}g C</span>
+                <span class="text-rose-400">${Math.round(tpl.macros.f)}g F</span>
+            </div>
+            <div class="flex flex-wrap gap-1">
+                ${tpl.items.map(item => `<span class="text-[10px] bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${item.name}</span>`).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function addTemplateToDay(idx) {
+    const tpl = mealTemplates[idx];
+    
+    // Gör en djupkopia så att vi inte råkar redigera mallen när vi redigerar dagens måltid
+    const newMeal = {
+        name: tpl.name,
+        items: JSON.parse(JSON.stringify(tpl.items)),
+        macros: JSON.parse(JSON.stringify(tpl.macros)),
+        micros: JSON.parse(JSON.stringify(tpl.micros)),
+        completed: false
+    };
+
+    dietData[currentDietDay].push(newMeal);
+    saveDietData();
+    closeTemplatesModal();
+    renderDietWeek();
+}
+
+function deleteTemplate(idx) {
+    if (confirm("Är du säker på att du vill ta bort denna mall?")) {
+        mealTemplates.splice(idx, 1);
+        saveDietTemplates();
+        renderTemplatesList();
+    }
 }

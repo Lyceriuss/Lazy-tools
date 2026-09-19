@@ -60,6 +60,7 @@
           </div>
           <div class="flex gap-2 self-start sm:self-auto">
             <button onclick="openTargetsModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium px-3 py-2 rounded-xl transition">⚙️ Targets</button>
+            <button onclick="openTemplatesModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-2 rounded-xl transition">📄 Mallar</button>
             <button onclick="openMealModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg">
               <span>+</span> Add Meal
             </button>
@@ -84,7 +85,7 @@
             </div>
           </div>
 
-          <!-- 2. MAKROS (Protein, Fett, Kolhydrat - i rätt ordning) -->
+          <!-- 2. MAKROS (Protein, Fett, Kolhydrat) -->
           <div class="grid grid-cols-3 gap-4 sm:gap-6">
             <div>
               <div class="flex justify-between text-[11px] mb-1.5"><span class="text-slate-400 uppercase font-bold tracking-wider">Protein</span><span id="prog-p-text" class="text-sky-400 font-mono font-semibold">0/0</span></div>
@@ -214,13 +215,33 @@
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
-        <button onclick="closeMealModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
-        <button onclick="saveMealToDay()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/30">Save Meal</button>
+      <div class="flex justify-between items-center border-t border-slate-800 pt-3">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="save-as-template" class="w-4 h-4 accent-emerald-500 rounded border-slate-700 bg-slate-900 cursor-pointer">
+          <label for="save-as-template" class="text-xs text-slate-400 cursor-pointer">Spara som mall</label>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="closeMealModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
+          <button onclick="saveMealToDay()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/30">Save Meal</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- TEMPLATES MODAL -->
+  <div id="templates-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4 max-h-[80vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-lg font-bold text-white">Mina Måltidsmallar</h3>
+        <button onclick="closeTemplatesModal()" class="text-slate-400 hover:text-white text-xl font-bold px-2">&times;</button>
+      </div>
+      <div id="templates-list" class="overflow-y-auto pr-1 flex-1 space-y-3">
+        <!-- Fylls av JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="js/database.js"></script>
   <script src="js/app.js"></script>
   <script src="js/discord.js"></script>
